@@ -25,7 +25,7 @@ using System.Windows.Markup;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("d9347488-de38-4855-bf12-fc8a417743ca")]
 
-[assembly: XmlnsDefinition("http://www.codeplex.com/prism", "Microsoft.Practices.Prism.ViewModel")]
+[assembly: XmlnsDefinition("http://www.codeplex.com/prism", "Microsoft.Practices.Prism.Mvvm")]
 
 // Version information for an assembly consists of the following four values:
 //
