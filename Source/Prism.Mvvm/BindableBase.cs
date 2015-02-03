@@ -45,7 +45,7 @@ namespace Microsoft.Practices.Prism.Mvvm
         /// <param name="propertyName">Name of the property used to notify listeners. This
         /// value is optional and can be provided automatically when invoked from compilers
         /// that support <see cref="CallerMemberNameAttribute"/>.</param>
-        protected void OnPropertyChanged(string propertyName)
+        protected virtual void OnPropertyChanged([CallerMemberName]string propertyName = null)
         {
             var eventHandler = this.PropertyChanged;
             if (eventHandler != null)
@@ -59,7 +59,7 @@ namespace Microsoft.Practices.Prism.Mvvm
         /// </summary>
         /// <typeparam name="T">The type of the property that has a new value</typeparam>
         /// <param name="propertyExpression">A Lambda expression representing the property that has a new value.</param>
-        protected void OnPropertyChanged<T>(Expression<Func<T>> propertyExpression)
+        protected virtual void OnPropertyChanged<T>(Expression<Func<T>> propertyExpression)
         {
             var propertyName = PropertySupport.ExtractPropertyName(propertyExpression);
             this.OnPropertyChanged(propertyName);
