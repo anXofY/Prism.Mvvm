@@ -28,15 +28,8 @@ namespace Microsoft.Practices.Prism.Mvvm
 
         private static void AutoWireViewModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var view = d as IView;
-
-            if (view == null)
-            {
-                // TODO: Improve exception
-                throw new Exception("Your views must implement IView");
-            }
-
-            ViewModelLocationProvider.AutoWireViewModelChanged(view);
+            if ((bool)e.NewValue)
+                ViewModelLocationProvider.AutoWireViewModelChanged(d);
         }
 
         /// <summary>

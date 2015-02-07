@@ -14,7 +14,7 @@ namespace Microsoft.Practices.Prism.Mvvm
     /// This class also provide methods for registering the view model factories,
     /// and also to override the default view model factory and the default view type to view model type resolver.
     /// </summary>
-    
+
     // Documentation on using the MVVM pattern is at http://go.microsoft.com/fwlink/?LinkID=288814&clcid=0x409
 
     public static class ViewModelLocationProvider
@@ -27,11 +27,11 @@ namespace Microsoft.Practices.Prism.Mvvm
         /// The default view model factory.
         /// </summary>
         private static Func<Type, object> defaultViewModelFactory = type => Activator.CreateInstance(type);
-        
+
         /// <summary>
         /// Default view type to view model type resolver, assumes the view model is in same assembly as the view type, but in the "ViewModels" namespace.
         /// </summary>
-        private static Func<Type, Type> defaultViewTypeToViewModelTypeResolver = 
+        private static Func<Type, Type> defaultViewTypeToViewModelTypeResolver =
             viewType =>
             {
                 var viewName = viewType.FullName;
@@ -66,7 +66,7 @@ namespace Microsoft.Practices.Prism.Mvvm
         /// </summary>
         /// <param name="view">The dependency object, typically a view.</param>
         /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
-        public static void AutoWireViewModelChanged(IView view)
+        public static void AutoWireViewModelChanged(object view)
         {
             // Try mappings first
             object viewModel = GetViewModelForView(view);
@@ -79,8 +79,29 @@ namespace Microsoft.Practices.Prism.Mvvm
                 // Really need Container or Factories here to deal with injecting dependencies on construction
                 viewModel = defaultViewModelFactory(viewModelType);
             }
-            
-            view.DataContext = viewModel;
+
+            SetViewDataContext(view, viewModel);
+        }
+
+        /// <summary>
+        /// Sets the DataContext of a View
+        /// </summary>
+        /// <param name="view">The View to set the DatContext on</param>
+        /// <param name="dataContext">The object to use as the DataContext for the View</param>
+        private static void SetViewDataContext(object view, object dataContext)
+        {
+            //IView has been deprecated, but it is still supported until it is removed from the code base
+            var iView = view as IView;
+            if (iView != null)
+            {
+                iView.DataContext = dataContext;
+            }
+            else
+            {
+                PropertyInfo prop = view.GetType().GetRuntimeProperty("DataContext");
+                if (prop != null)
+                    prop.SetValue(view, dataContext);
+            }            
         }
 
         /// <summary>
@@ -88,11 +109,14 @@ namespace Microsoft.Practices.Prism.Mvvm
         /// </summary>
         /// <param name="view">The view that the view model wants.</param>
         /// <returns>The vie wmodel that corresponds to the view passed as a parameter.</returns>
-        private static object GetViewModelForView(IView view)
+        private static object GetViewModelForView(object view)
         {
+            var viewKey = view.GetType().ToString();
+
             // Mapping of view models base on view type (or instance) goes here
-            if (factories.ContainsKey(view.GetType().ToString()))
-                return factories[view.GetType().ToString()]();
+            if (factories.ContainsKey(viewKey))
+                return factories[viewKey]();
+
             return null;
         }
 
