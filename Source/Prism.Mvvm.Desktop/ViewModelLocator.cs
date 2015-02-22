@@ -17,48 +17,35 @@ namespace Microsoft.Practices.Prism.Mvvm
     /// </summary>
     public static class ViewModelLocator
     {
-        #region Attached property with convention-or-mapping based approach
-
         /// <summary>
         /// The AutoWireViewModel attached property.
         /// </summary>
-        public static DependencyProperty AutoWireViewModelProperty =
-            DependencyProperty.RegisterAttached("AutoWireViewModel", typeof(bool), typeof(ViewModelLocator),
-            new PropertyMetadata(false, AutoWireViewModelChanged));
+        public static DependencyProperty AutoWireViewModelProperty = DependencyProperty.RegisterAttached("AutoWireViewModel", typeof(bool), typeof(ViewModelLocator), new PropertyMetadata(false, AutoWireViewModelChanged));
+        public static bool GetAutoWireViewModel(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(AutoWireViewModelProperty);
+        }
+        public static void SetAutoWireViewModel(DependencyObject obj, bool value)
+        {
+            obj.SetValue(AutoWireViewModelProperty, value);
+        }
 
         private static void AutoWireViewModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if ((bool)e.NewValue)
-                ViewModelLocationProvider.AutoWireViewModelChanged(d);
+                ViewModelLocationProvider.AutoWireViewModelChanged(d, Bind);
         }
 
         /// <summary>
-        /// Gets the value of the AutoWireViewModel attached property.
+        /// Sets the DataContext of a View
         /// </summary>
-        /// <param name="obj">The dependency object that has this attached property.</param>
-        /// <returns><c>True</c> if view model autowiring is enabled; otherwise, <c>false</c>.</returns>
-        public static bool GetAutoWireViewModel(DependencyObject obj)
+        /// <param name="view">The View to set the DataContext on</param>
+        /// <param name="dataContext">The object to use as the DataContext for the View</param>
+        static void Bind(object view, object viewModel)
         {
-            if (obj != null)
-            {
-                return (bool)obj.GetValue(AutoWireViewModelProperty);
-            }
-            return false;
+            FrameworkElement element = view as FrameworkElement;
+            if (element != null)
+                element.DataContext = viewModel;
         }
-
-        /// <summary>
-        /// Sets the value of the AutoWireViewModel attached property.
-        /// </summary>
-        /// <param name="obj">The dependency object that has this attached property.</param>
-        /// <param name="value">if set to <c>true</c> the view model wiring will be performed.</param>
-        public static void SetAutoWireViewModel(DependencyObject obj, bool value)
-        {
-            if (obj != null)
-            {
-                obj.SetValue(AutoWireViewModelProperty, value);
-            }
-        }
-
-        #endregion
     }
 }

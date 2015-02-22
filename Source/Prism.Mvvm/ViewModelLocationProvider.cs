@@ -66,7 +66,7 @@ namespace Microsoft.Practices.Prism.Mvvm
         /// </summary>
         /// <param name="view">The dependency object, typically a view.</param>
         /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
-        public static void AutoWireViewModelChanged(object view)
+        public static void AutoWireViewModelChanged(object view, Action<object, object> setDataContextCallback)
         {
             // Try mappings first
             object viewModel = GetViewModelForView(view);
@@ -80,28 +80,7 @@ namespace Microsoft.Practices.Prism.Mvvm
                 viewModel = defaultViewModelFactory(viewModelType);
             }
 
-            SetViewDataContext(view, viewModel);
-        }
-
-        /// <summary>
-        /// Sets the DataContext of a View
-        /// </summary>
-        /// <param name="view">The View to set the DatContext on</param>
-        /// <param name="dataContext">The object to use as the DataContext for the View</param>
-        private static void SetViewDataContext(object view, object dataContext)
-        {
-            //IView has been deprecated, but it is still supported until it is removed from the code base
-            var iView = view as IView;
-            if (iView != null)
-            {
-                iView.DataContext = dataContext;
-            }
-            else
-            {
-                PropertyInfo prop = view.GetType().GetRuntimeProperty("DataContext");
-                if (prop != null)
-                    prop.SetValue(view, dataContext);
-            }            
+            setDataContextCallback(view, viewModel);
         }
 
         /// <summary>
